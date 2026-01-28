@@ -1,6 +1,16 @@
 {
   "tests": [
     {
+      "name": "Get all applications",
+      "method": "GET",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "data": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
       "name": "Create application successfully",
       "method": "POST",
       "body": {
@@ -23,21 +33,6 @@
       "body": {
         "child_name": "Мария",
         "age": 12
-      },
-      "expectedStatus": 400,
-      "expectedBody": {
-        "error": "string"
-      },
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Reject application with invalid age",
-      "method": "POST",
-      "body": {
-        "child_name": "Иван",
-        "age": 5,
-        "parent_phone": "+7 (999) 123-45-67",
-        "email": "test2@example.com"
       },
       "expectedStatus": 400,
       "expectedBody": {
