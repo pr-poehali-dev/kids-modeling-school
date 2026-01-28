@@ -1,0 +1,49 @@
+{
+  "tests": [
+    {
+      "name": "Create application successfully",
+      "method": "POST",
+      "body": {
+        "child_name": "Анна Тестова",
+        "age": 10,
+        "parent_phone": "+7 (999) 123-45-67",
+        "email": "test@example.com",
+        "comment": "Хотим попробовать"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Reject application with missing fields",
+      "method": "POST",
+      "body": {
+        "child_name": "Мария",
+        "age": 12
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Reject application with invalid age",
+      "method": "POST",
+      "body": {
+        "child_name": "Иван",
+        "age": 5,
+        "parent_phone": "+7 (999) 123-45-67",
+        "email": "test2@example.com"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

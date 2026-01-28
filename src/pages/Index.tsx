@@ -4,10 +4,70 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    child_name: '',
+    age: '',
+    parent_phone: '',
+    email: '',
+    comment: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/4130ddb3-3e53-491a-90dc-b8da5a47f1d8', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Заявка отправлена!",
+          description: "Мы свяжемся с вами в ближайшее время",
+        });
+        setFormData({
+          child_name: '',
+          age: '',
+          parent_phone: '',
+          email: '',
+          comment: ''
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: data.error || "Не удалось отправить заявку",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить заявку. Попробуйте позже.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const courses = [
     {
@@ -420,29 +480,72 @@ const Index = () => {
             </div>
             <Card className="border-none shadow-2xl">
               <CardContent className="pt-8 pb-6">
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleSubmit}>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Имя ребёнка</label>
-                    <Input placeholder="Введите имя" className="bg-secondary/30" />
+                    <Input 
+                      name="child_name"
+                      value={formData.child_name}
+                      onChange={handleInputChange}
+                      placeholder="Введите имя" 
+                      className="bg-secondary/30" 
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Возраст</label>
-                    <Input type="number" placeholder="Возраст" className="bg-secondary/30" />
+                    <Input 
+                      name="age"
+                      value={formData.age}
+                      onChange={handleInputChange}
+                      type="number" 
+                      placeholder="Возраст" 
+                      className="bg-secondary/30" 
+                      min="7"
+                      max="14"
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Телефон родителя</label>
-                    <Input placeholder="+7 (___) ___-__-__" className="bg-secondary/30" />
+                    <Input 
+                      name="parent_phone"
+                      value={formData.parent_phone}
+                      onChange={handleInputChange}
+                      placeholder="+7 (___) ___-__-__" 
+                      className="bg-secondary/30" 
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Email</label>
-                    <Input type="email" placeholder="email@example.com" className="bg-secondary/30" />
+                    <Input 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      type="email" 
+                      placeholder="email@example.com" 
+                      className="bg-secondary/30" 
+                      required
+                    />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Комментарий</label>
-                    <Textarea placeholder="Расскажите о вашем ребёнке" className="bg-secondary/30" />
+                    <Textarea 
+                      name="comment"
+                      value={formData.comment}
+                      onChange={handleInputChange}
+                      placeholder="Расскажите о вашем ребёнке" 
+                      className="bg-secondary/30" 
+                    />
                   </div>
-                  <Button className="w-full bg-accent hover:bg-accent/90 text-primary" size="lg">
-                    Отправить заявку
+                  <Button 
+                    type="submit"
+                    className="w-full bg-accent hover:bg-accent/90 text-primary" 
+                    size="lg"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
                   </Button>
                 </form>
               </CardContent>
